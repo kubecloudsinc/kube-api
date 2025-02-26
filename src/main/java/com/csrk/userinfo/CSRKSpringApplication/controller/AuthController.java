@@ -4,6 +4,8 @@ import com.csrk.userinfo.CSRKSpringApplication.entity.Employees;
 import com.csrk.userinfo.CSRKSpringApplication.entity.User;
 import com.csrk.userinfo.CSRKSpringApplication.service.EmployeesService;
 import com.csrk.userinfo.CSRKSpringApplication.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -38,14 +41,22 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
+    public ResponseEntity<String> loginUser(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) throws IOException {
         Optional<User> existingUser = userService.findByEmail(user.getEmail());
         if (existingUser.isPresent() && passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword())) {
+            request.getSession().setAttribute("user", existingUser.get());
             return ResponseEntity.ok("Login successful");
         } else {
             return ResponseEntity.status(401).body("Invalid email or password");
         }
     }
+
+    @GetMapping("/logout")
+    public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        request.getSession().invalidate();
+        return ResponseEntity.ok("Logout successful");
+    }
+
 
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody String email) {
