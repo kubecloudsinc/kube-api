@@ -4,6 +4,8 @@ import com.csrk.userinfo.CSRKSpringApplication.entity.Employees;
 import com.csrk.userinfo.CSRKSpringApplication.entity.User;
 import com.csrk.userinfo.CSRKSpringApplication.service.EmployeesService;
 import com.csrk.userinfo.CSRKSpringApplication.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private UserService userService;
@@ -68,6 +72,7 @@ public class AuthController {
     @GetMapping("/employees")
     public ResponseEntity<Page<Employees>> getAllEmployees(
             @PageableDefault(sort = {"lastName"}, direction = Sort.Direction.ASC) Pageable pageable) {
+        logger.debug("Fetching all employees with pagination and sorting");
         Page<Employees> employees = employeesService.getAllEmployees(pageable);
         return ResponseEntity.ok(employees);
     }
