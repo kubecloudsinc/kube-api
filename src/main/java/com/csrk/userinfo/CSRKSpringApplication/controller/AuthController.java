@@ -57,7 +57,6 @@ public class AuthController {
         return ResponseEntity.ok("Logout successful");
     }
 
-
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody String email) {
         Optional<User> user = userService.findByEmail(email);
